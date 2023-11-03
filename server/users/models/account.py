@@ -17,13 +17,18 @@ class Account(AbstractBaseUser, AccountUserManager, PermissionsMixin):
     
     first_name = models.CharField(max_length=55)
     last_name = models.CharField(max_length=55)
-    middle_name = models.CharField(max_length=55)
+    middle_name = models.CharField(max_length=55, null=True)
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
     avatar = models.ImageField(null=True)
 
     objects = AccountUserManager()
 
-# Creating an account model entails creating a submodel depending on a selected role
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'role']
+
 class AccountSubmodel(models.Model):
     user = models.ForeignKey(
         Account, 
