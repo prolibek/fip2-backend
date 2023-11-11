@@ -17,6 +17,6 @@ class CriteriaChoices(models.Model):
     choice_name = models.CharField(max_length=255)
 
 class Characteristics(models.Model):
-    resume = models.OneToOneField(Resume)
+    resume = models.OneToOneField(Resume, on_delete=models.CASCADE)
     data = models.JSONField()
     comments = models.TextField()

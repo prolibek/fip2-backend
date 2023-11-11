@@ -16,6 +16,8 @@ from dotenv import load_dotenv
 
 import os
 
+load_dotenv()
+
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -130,7 +132,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.models.Account'
+AUTH_USER_MODEL = 'users.Account'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),

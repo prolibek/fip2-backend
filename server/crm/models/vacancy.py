@@ -10,13 +10,13 @@ class VacancyRequestForm(models.Model):
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
 
-class VacancyRequestForm(models.Model):
+class VacancyRequestField(models.Model):
     form = models.ForeignKey(VacancyRequestForm, on_delete=models.CASCADE)
     field_name = models.CharField(max_length=255)
     field_type = models.CharField(max_length=50)
 
 class VacancyRequest(models.Model):
-    title = models.CharField(max_lengt=60)
+    title = models.CharField(max_length=60)
     data = models.JSONField()
 
     owner = models.ForeignKey(get_user_model(), on_delete=models.DO_NOTHING)

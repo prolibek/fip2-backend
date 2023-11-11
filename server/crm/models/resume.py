@@ -6,7 +6,8 @@ from .vacancy import Vacancy
 class Resume(models.Model):
     candidate = models.ForeignKey(
         get_user_model(),
-        null=True
+        null=True,
+        on_delete=models.DO_NOTHING
     )
 
 class ResumeComment(models.Model):

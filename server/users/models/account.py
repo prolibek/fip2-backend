@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from users.managers import AccountUserManager
-from crm.models import Department
 
-class Account(AbstractBaseUser, AccountUserManager, PermissionsMixin):
+class Account(AbstractBaseUser, PermissionsMixin):
     HR = 1
     MANAGER = 2
     CANDIDATE = 3
@@ -12,6 +11,8 @@ class Account(AbstractBaseUser, AccountUserManager, PermissionsMixin):
         (2, 'Manager'),
         (3, 'Candidate')
     )
+
+    email = models.EmailField(unique=True)
 
     role = models.SmallIntegerField(choices=role_choices)
     
@@ -43,7 +44,7 @@ class Manager(AccountSubmodel):
         on_delete=models.DO_NOTHING,
         null=True
     )
-    department = models.ForeignKey(Department, on_delete=models.DO_NOTHING)
+    department = models.ForeignKey('crm.Department', on_delete=models.DO_NOTHING)
 
 class HR(AccountSubmodel):
     pass
