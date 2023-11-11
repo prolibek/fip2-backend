@@ -55,3 +55,7 @@ drf_example
 .env 
 
 docs/
+
+.sqlite3
+
+db.sqlite3

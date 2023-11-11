@@ -1,16 +1,12 @@
-from django.shortcuts import get_object_or_404
-from django.contrib.auth import authenticate
-
 from rest_framework import views, status
 from rest_framework.response import Response
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import Account
 from users.serializers import UserLoginSerializer
 
 class RegisterAPIView(views.APIView):
-    def post(request):
+    def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
 
         if not serializer.is_valid():
