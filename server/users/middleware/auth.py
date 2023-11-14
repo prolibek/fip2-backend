@@ -1,3 +1,5 @@
+# Currently abandoned
+
 import jwt
 import requests
 import json
@@ -31,7 +33,7 @@ class AuthorizationMiddleware:
 
             refresh = requests.post(
                 url, 
-                json.dump(data),
+                json.dumps(data),
                 headers = { "Content-Type": "application/json" }            
             )
 
@@ -45,7 +47,7 @@ class AuthorizationMiddleware:
                 value = new_access_token,
                 secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
                 httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-                samesite = settings.SIMPLE_JWT['HTTP_ONLY_SAMESITE']
+                samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
             )
             request.META['HTTP_AUTHORIZATION'] = f'Bearer {new_access_token}'
 

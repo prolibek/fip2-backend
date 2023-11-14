@@ -16,7 +16,4 @@ class LogoutSerializer(serializers.Serializer):
         return attrs
     
     def save(self):
-        try: 
-            RefreshToken(self.token).blacklist()
-        except:
-            self.fail('bad_token')
+        RefreshToken(self.token).blacklist()

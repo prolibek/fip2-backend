@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 
     'crm',
     'users',
@@ -150,8 +151,8 @@ SESSION_COOKIE_SAMESITE = "Lax"
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
 
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
@@ -168,11 +169,7 @@ SIMPLE_JWT = {
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': {
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    },
-
-    'DEFAULT_PERMISSION_CLASSES': {
-        'rest_framework.permission.AllowAny',
-    }
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'users.authenticate.AccountAuthentication',
+    ],
 }

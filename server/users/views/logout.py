@@ -13,6 +13,10 @@ class LogoutAPIView(views.APIView):
         
         serializer.save()
 
-        return Response({
+        response = Response()
+        response.delete_cookie('access_token')
+        response.data = {
             "detail": "Account was succesfully logged out."
-        }, status=status.HTTP_200_OK)
+        }
+
+        return response
