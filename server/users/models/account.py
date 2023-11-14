@@ -1,6 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from users.managers import AccountUserManager
+from django.contrib.auth.models import AbstractBaseUser, UserManager, PermissionsMixin
 
 class Account(AbstractBaseUser, PermissionsMixin):
     HR = 1
@@ -25,7 +24,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     avatar = models.ImageField(null=True)
 
-    objects = AccountUserManager()
+    objects = UserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'role']

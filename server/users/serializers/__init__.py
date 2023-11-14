@@ -1,1 +1,2 @@
-from .user import *
+from .registration import *
+from .logout import *

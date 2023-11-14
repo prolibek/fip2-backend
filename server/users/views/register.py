@@ -3,11 +3,11 @@ from rest_framework.response import Response
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.serializers import UserLoginSerializer
+from users.serializers import UserRegisterSerializer
 
 class RegisterAPIView(views.APIView):
     def post(self, request):
-        serializer = UserLoginSerializer(data=request.data)
+        serializer = UserRegisterSerializer(data=request.data)
 
         if not serializer.is_valid():
             return Response({

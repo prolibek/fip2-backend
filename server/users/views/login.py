@@ -1,34 +1,45 @@
 from django.contrib.auth import authenticate
+from django.conf import settings
+from django.middleware import csrf
 
 from rest_framework import views, status
 from rest_framework.response import Response
 
-from rest_framework_simplejwt.tokens import RefreshToken
+from users.models import Account
 
-from users.serializers import UserLoginSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class LoginAPIView(views.APIView):
     def post(self, request):
-        serializer = UserLoginSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        email = request.data['email']
+        password = request.data['password']
 
-        email = request.validated_data['email']
-        password = request.validated_data['password']
-        
-        user = authenticate(email=email, password=password)
-        if user is None:
+        try:
+            user = Account.objects.get(email=email)
+        except Account.DoesNotExist:
             return Response({
-                'detail': 'Invalid credentials.'
+                'detail': 'User not found.'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.check_password(password):
+            return Response({
+                'detail': 'Password is incorrect.'
             }, status=status.HTTP_401_UNAUTHORIZED)
         
-        token = RefreshToken.for_user(user)
+        response = Response()
+        tokens = RefreshToken.for_user(user)
 
-        return Response({
-            'detail': 'Account succesfully authorized.',
-            'access_token': str(token.access_token),
-            'refresh_token': str(token)        
-        }, status=status.HTTP_200_OK)
+        response.set_cookie(
+            key = settings.SIMPLE_JWT['AUTH_COOKIE'],
+            expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+            value = tokens.access_token,
+            secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+            httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+            samesite = settings.SIMPLE_JWT['HTTP_ONLY_SAMESITE']
+        )
+
+        csrf.get_token(request)
+
+        response.data = tokens
+
+        return response 
