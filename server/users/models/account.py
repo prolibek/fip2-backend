@@ -1,5 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, UserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+
+from users.managers import AccountUserManager
 
 class Account(AbstractBaseUser, PermissionsMixin):
     HR = 1
@@ -21,10 +23,11 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
 
     avatar = models.ImageField(null=True)
 
-    objects = UserManager()
+    objects = AccountUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'role']

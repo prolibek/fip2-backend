@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from users.models import Manager
 
 from .organisation import Organisation
+from .form import FormField, FormChoiceOptions
 
 class VacancyCategory(models.Model):
     name = models.CharField(max_length=60)
@@ -12,10 +13,11 @@ class VacancyRequestForm(models.Model):
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
 
-class VacancyRequestField(models.Model):
+class VacancyRequestField(FormField):
     form = models.ForeignKey(VacancyRequestForm, on_delete=models.CASCADE)
-    field_name = models.CharField(max_length=255)
-    field_type = models.CharField(max_length=50)
+
+class VacancyRequestChoiceOptions(FormChoiceOptions):
+    field = models.ForeignKey(VacancyRequestField, on_delete=models.CASCADE)
 
 class VacancyRequest(models.Model):
     title = models.CharField(max_length=60)
