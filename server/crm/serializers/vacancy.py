@@ -1,7 +1,7 @@
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from crm.models import Vacancy
 
-class VacancySerializer(serializers.ModelSerializer):
+class VacancySerializer(ModelSerializer):
     model = Vacancy
     fields = '__all__'

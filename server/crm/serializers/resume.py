@@ -1,7 +1,7 @@
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from crm.models import Resume
 
-class ResumeSerializer(serializers.ModelSerializer):
+class ResumeSerializer(ModelSerializer):
     model = Resume
     fields = '__all__'
