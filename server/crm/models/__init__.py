@@ -5,3 +5,4 @@ from .request import *
 from .resume import *
 from .vacancy import *
 from .form import *
+from .category import *

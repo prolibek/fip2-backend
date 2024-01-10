@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     'crm',
     'users',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -170,6 +171,8 @@ SIMPLE_JWT = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'users.authenticate.AccountAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
     ],
 }
