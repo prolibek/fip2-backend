@@ -11,3 +11,6 @@ class Organisation(models.Model):
         on_delete=models.DO_NOTHING,
         null=True
     )
+
+    def __str__(self):
+        return self.name

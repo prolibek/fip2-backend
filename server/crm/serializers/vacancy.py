@@ -2,6 +2,7 @@ from rest_framework.serializers import ModelSerializer
 
 from crm.models import Vacancy
 from .category import VacancyCategorySerializer
+from .organisation import OrganisationSerializer
 from users.serializers import AccountSerializer
 
 class VacancySerializer(ModelSerializer):
@@ -14,5 +15,6 @@ class VacancySerializer(ModelSerializer):
 
         rep['owner'] = AccountSerializer(instance.owner).data
         rep['category'] = VacancyCategorySerializer(instance.category).data
+        rep['organisation'] = OrganisationSerializer(instance.organisation).data
 
         return rep

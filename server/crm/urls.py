@@ -11,10 +11,11 @@ router = DefaultRouter()
 router.register(r'organisations', OrganisationViewSet, basename='organisation')
 router.register(r'vacancies', VacancyViewSet, basename='vacancy')
 
-department_router = NestedSimpleRouter(router, r'organisations', lookup='organisation')
-department_router.register(r'departments', DepartmentViewSet, basename='organisations-departments')
+organisation_nested_router = NestedSimpleRouter(router, r'organisations', lookup='organisation')
+organisation_nested_router.register(r'departments', DepartmentViewSet, basename='organisations-departments')
+organisation_nested_router.register(r'vacancies', VacancyViewSet, basename='organisations-vacancies')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('', include(department_router.urls)),
+    path('', include(organisation_nested_router.urls)),
 ]
