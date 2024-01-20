@@ -22,4 +22,4 @@ class OrganisationSerializer(ModelSerializer):
 class DepartmentSerializer(ModelSerializer):
     class Meta:
         model = Department
-        fields = '__all__'
+        fields = ('name', 'parent_department')

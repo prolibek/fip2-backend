@@ -9,13 +9,15 @@ from rest_framework_nested.routers import NestedSimpleRouter
 router = DefaultRouter()
 
 router.register(r'organisations', OrganisationViewSet, basename='organisation')
-router.register(r'vacancies', VacancyViewSet, basename='vacancy')
 
-organisation_nested_router = NestedSimpleRouter(router, r'organisations', lookup='organisation')
-organisation_nested_router.register(r'departments', DepartmentViewSet, basename='organisations-departments')
-organisation_nested_router.register(r'vacancies', VacancyViewSet, basename='organisations-vacancies')
+organisation_router = NestedSimpleRouter(router, r'organisations', lookup='organisation')
+organisation_router.register(r'departments', DepartmentViewSet, basename='departments')
+organisation_router.register(r'vacancies', VacancyViewSet, basename='vacancies')
+vacancy_router = NestedSimpleRouter(organisation_router, r'vacancies', lookup='vacancy')
+vacancy_router.register(r'resumes', ResumeViewSet, basename='resumes')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('', include(organisation_nested_router.urls)),
+    path(r'', include(router.urls)),
+    path(r'', include(organisation_router.urls)),
+    path(r'', include(vacancy_router.urls)),
 ]

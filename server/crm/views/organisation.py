@@ -32,13 +32,10 @@ class DepartmentViewSet(ModelViewSet):
         return Department.objects.filter(organisation=self.kwargs['organisation_id'])
     
     def create(self, request, *args, **kwargs):
-        organisation_id = self.kwargs['organisation_id']
-
-        request.data['organisation'] = organisation_id
         serializer = DepartmentSerializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(organisation_id=kwargs['organisation_id'])
             return Response(serializer.data)
         
         else:
