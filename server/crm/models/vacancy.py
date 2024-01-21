@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from users.models import Manager
+from .manager import Manager
 
 from .organisation import Organisation
 from .form import FormField, FormChoiceOptions

@@ -9,15 +9,14 @@ class ResumeViewSet(ModelViewSet):
     serializer_class = ResumeSerializer
 
     def get_queryset(self):
-        return Resume.objects.filter(vacancy=self.kwargs['vacancy_id'])
+        return Resume.objects.filter(vacancy_id=self.kwargs['vacancy_pk'])
     
     def create(self, request, *args, **kwargs):
         serializer = ResumeSerializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save(vacancy_id=kwargs['vacancy_id'])
+            serializer.save(vacancy_id=kwargs['vacancy_pk'])
             return Response(serializer.data)
-        
         else:
             return Response(
                 serializer.errors,

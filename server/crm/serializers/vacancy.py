@@ -3,7 +3,7 @@ from rest_framework.serializers import ModelSerializer
 from crm.models import Vacancy
 from .category import VacancyCategorySerializer
 from .organisation import OrganisationSerializer
-from users.serializers import AccountSerializer
+from .manager import ManagerSerializer
 
 class VacancySerializer(ModelSerializer):
     class Meta:
@@ -13,7 +13,7 @@ class VacancySerializer(ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
 
-        rep['owner'] = AccountSerializer(instance.owner).data
+        rep['owner'] = ManagerSerializer(instance.owner).data
         rep['category'] = VacancyCategorySerializer(instance.category).data
         rep['organisation'] = OrganisationSerializer(instance.organisation).data
 

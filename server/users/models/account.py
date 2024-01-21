@@ -31,25 +31,3 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'role']
-
-class AccountSubmodel(models.Model):
-    user = models.ForeignKey(
-        Account, 
-        on_delete=models.CASCADE,
-        null=True    
-    )
-
-class Manager(AccountSubmodel):
-    position = models.CharField(max_length=64) 
-    parent_manager = models.ForeignKey(
-        'self', 
-        on_delete=models.DO_NOTHING,
-        null=True
-    )
-    department = models.ForeignKey('crm.Department', on_delete=models.DO_NOTHING)
-
-class HR(AccountSubmodel):
-    pass
-
-class Candidate(AccountSubmodel):
-    pass
