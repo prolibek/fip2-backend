@@ -3,8 +3,6 @@ from django.contrib.auth import get_user_model
 
 from .manager import Manager
 
-from .organisation import Organisation
-
 class VacancyCategory(models.Model):
     name = models.CharField(max_length=255)
 

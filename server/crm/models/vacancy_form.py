@@ -1,10 +1,8 @@
 from django.db import models 
 
-from .organisation import Organisation
 
 class VacancyRequestForm(models.Model):
     form_title = models.CharField(max_length=255)
-    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
 
 class VacancyRequestFormBlock(models.Model):
     block_name = models.CharField(max_length=255)

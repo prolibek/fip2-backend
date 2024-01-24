@@ -10,7 +10,6 @@ class Manager(models.Model):
         null=True
     )
     department = models.ForeignKey('crm.Department', on_delete=models.DO_NOTHING, null=True)
-    organisation = models.ForeignKey('crm.Organisation', on_delete=models.CASCADE)
     user = models.ForeignKey(Account, on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):

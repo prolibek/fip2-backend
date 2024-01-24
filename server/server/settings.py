@@ -34,7 +34,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+SHARED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,13 +45,31 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-
-    'crm',
-    'users',
+    
+    'django_tenants',
     'drf_yasg',
+
+    'users',
 ]
 
+TENANT_APPS = [
+    'crm',
+]
+
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
+
+TENANT_SUBFOLDER_PREFIX = 'organisations'
+
+INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
+TENANT_MODEL = 'users.Organisation'
+
+TENANT_DOMAIN_MODEL = 'users.Domain'
+
 MIDDLEWARE = [
+    'django_tenants.middleware.TenantSubfolderMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -87,7 +105,7 @@ WSGI_APPLICATION = 'server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django_tenants.postgresql_backend',
         'NAME': 'stelladb',
         'USER': os.environ.get('SQL_NAME'),
         'PASSWORD': os.environ.get('SQL_PASSWORD'),
