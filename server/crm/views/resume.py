@@ -22,5 +22,3 @@ class ResumeViewSet(ModelViewSet):
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # (a+b)*(a-b) = a^2 - b^2

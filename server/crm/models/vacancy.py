@@ -14,7 +14,6 @@ class VacancyCategory(models.Model):
 class Vacancy(models.Model):
     job_title = models.CharField(max_length=255)
     owner = models.ForeignKey(Manager, on_delete=models.DO_NOTHING)
-    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
     limit = models.IntegerField(null=True)
 
     category = models.ForeignKey(
@@ -22,6 +21,8 @@ class Vacancy(models.Model):
         on_delete=models.DO_NOTHING,
         null=True
     )
+
+    date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
