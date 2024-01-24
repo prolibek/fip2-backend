@@ -8,13 +8,12 @@ from .manager import ManagerSerializer
 class VacancySerializer(ModelSerializer):
     class Meta:
         model = Vacancy
-        fields = '__all__'
+        exclude = ('organisation', )
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
 
         rep['owner'] = ManagerSerializer(instance.owner).data
         rep['category'] = VacancyCategorySerializer(instance.category).data
-        rep['organisation'] = OrganisationSerializer(instance.organisation).data
 
         return rep

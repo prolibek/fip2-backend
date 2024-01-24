@@ -9,7 +9,7 @@ class VacancyRequestViewSet(ModelViewSet):
     serializer_class = VacancyRequestSerializer
 
     def get_queryset(self):
-        return VacancyRequest.objects.filter(organisation=self.kwargs['organisation_id'])
+        return VacancyRequest.objects.filter(owner__organisation=self.kwargs['organisation_id'])
     
     def create(self, request, *args, **kwargs):
         serializer = VacancyRequestSerializer(data=request.data)
