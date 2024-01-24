@@ -1,26 +1,25 @@
+from crm.serializers import VacancyRequestSerializer 
+from crm.models import VacancyRequest
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
-from crm.serializers import ResumeSerializer
-from crm.models import Resume 
-
-class ResumeViewSet(ModelViewSet):
-    serializer_class = ResumeSerializer
+class VacancyRequestViewSet(ModelViewSet):
+    serializer_class = VacancyRequestSerializer
 
     def get_queryset(self):
-        return Resume.objects.filter(vacancy_id=self.kwargs['vacancy_pk'])
+        return VacancyRequest.objects.filter(organisation=self.kwargs['organisation_id'])
     
     def create(self, request, *args, **kwargs):
-        serializer = ResumeSerializer(data=request.data)
+        serializer = VacancyRequestSerializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save(vacancy_id=kwargs['vacancy_pk'])
+            serializer.save(organisation_id=kwargs['organisation_id'])
             return Response(serializer.data)
+        
         else:
             return Response(
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # (a+b)*(a-b) = a^2 - b^2

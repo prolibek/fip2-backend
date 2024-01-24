@@ -3,6 +3,7 @@ from .department import *
 from .organisation import *
 from .resume import *
 from .vacancy import *
-from .form import *
+from .vacancy_form import *
+from .vacancy_request import *
 from .category import *
 from .manager import *
