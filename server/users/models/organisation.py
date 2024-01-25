@@ -9,9 +9,9 @@ class OrganisationCategory(models.Model):
 class Organisation(TenantMixin):
     name = models.CharField(max_length=60)
     description = models.TextField(null=True)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)
 
-    creator = models.ForeignKey(get_user_model(), on_delete=models.DO_NOTHING, null=True)
+    creator = models.ForeignKey(get_user_model(), on_delete=models.DO_NOTHING)
 
     category = models.ForeignKey(
         OrganisationCategory,

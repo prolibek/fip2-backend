@@ -39,10 +39,10 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(
-        r"api/v1/docs/$",
+        r'api/v1/docs/$',
         schema_view.with_ui('swagger', cache_timeout=0), 
         name='schema-swagger-ui'
     ),
-    path(r'api/v1/users/', include('users.urls')),
+    path(r'api/v1/public/', include('users.urls')),
     path(r'api/v1/management/', include('crm.urls'))
 ]
