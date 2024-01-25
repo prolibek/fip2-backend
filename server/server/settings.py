@@ -60,16 +60,18 @@ DATABASE_ROUTERS = (
     'django_tenants.routers.TenantSyncRouter',
 )
 
-TENANT_SUBFOLDER_PREFIX = 'organisations'
-
 INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
+TENANT_SUBFOLDER_PREFIX = 'organisations'
 TENANT_MODEL = 'users.Organisation'
-
 TENANT_DOMAIN_MODEL = 'users.Domain'
 
+ROOT_URLCONF = 'server.urls_tenants'
+PUBLIC_SCHEMA_URLCONF = 'server.urls_public'
+
 MIDDLEWARE = [
-    'django_tenants.middleware.TenantSubfolderMiddleware',
+    #'django_tenants.middleware.TenantSubfolderMiddleware',
+    'server.middleware.TenantSubdomainMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,8 +80,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-ROOT_URLCONF = 'server.urls'
 
 TEMPLATES = [
     {
