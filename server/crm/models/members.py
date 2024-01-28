@@ -1,13 +1,14 @@
-from django.db import models
-from django.contrib.auth import get_user_model
+from django.db import models 
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.crypto import get_random_string
+from django.contrib.auth import get_user_model
 
-from users.models import Permission
+from users.models import Permission, Organisation
 
 class Member(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
 
 class MemberPermissions(models.Model): 
@@ -16,6 +17,7 @@ class MemberPermissions(models.Model):
 
 class Invitation(models.Model):
     email = models.EmailField()
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
     token = models.CharField(max_length=50, unique=True)
     is_used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -37,7 +39,9 @@ class Invitation(models.Model):
         )
 
     @classmethod
-    def create_invitation(cls, email):
-        invitation = cls(email=email)
+    def create_invitation(cls, email, organisation):
+        invitation = cls(email=email, organisation=organisation)
         invitation.save()
         invitation.send_invitation()
+
+        return invitation
