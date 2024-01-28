@@ -10,9 +10,10 @@ class RegisterAPIView(views.APIView):
         serializer = UserRegisterSerializer(data=request.data)
 
         if not serializer.is_valid():
-            return Response({
-                'detail': 'Invalid credentials.'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         user = serializer.save()
 

@@ -9,8 +9,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     CANDIDATE = 3
     role_choices = (
         (1, 'HR'),
-        (2, 'Manager'),
-        (3, 'Candidate')
+        (2, 'Manager')
     )
 
     email = models.EmailField(unique=True)

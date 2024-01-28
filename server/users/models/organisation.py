@@ -15,8 +15,7 @@ class Organisation(TenantMixin):
 
     category = models.ForeignKey(
         OrganisationCategory,
-        on_delete=models.DO_NOTHING,
-        null=True
+        on_delete=models.DO_NOTHING
     )
 
     def __str__(self):
