@@ -23,4 +23,4 @@ class Vacancy(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
+        return self.job_title
