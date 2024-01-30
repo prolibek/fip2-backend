@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.db import transaction, connection
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
@@ -7,6 +7,8 @@ from rest_framework import status
 
 from users.serializers import OrganisationSerializer
 from users.models import Organisation, Domain
+
+from crm.models import Member
 
 class OrganisationViewSet(ModelViewSet):
     serializer_class = OrganisationSerializer
@@ -35,6 +37,15 @@ class OrganisationViewSet(ModelViewSet):
                 tenant=organisation
             )
             domain.save()
+
+            # go into tenant database and set creator as a member
+            connection.set_tenant(organisation)
+            member = Member.objects.create(
+                organisation=organisation,
+                user=request.user
+            )
+            member.save()
+            connection.set_schema_to_public
 
             return Response(
                 serializer.data,
