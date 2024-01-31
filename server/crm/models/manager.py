@@ -1,6 +1,6 @@
 from django.db import models
 
-from users.models import Account
+from .members import Member
 
 class Manager(models.Model):
     position = models.CharField(max_length=64)
@@ -10,7 +10,7 @@ class Manager(models.Model):
         null=True
     )
     department = models.ForeignKey('crm.Department', on_delete=models.DO_NOTHING, null=True)
-    user = models.ForeignKey(Account, on_delete=models.DO_NOTHING, null=True)
+    member = models.ForeignKey(Member, on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):
         return self.position
