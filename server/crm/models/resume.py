@@ -22,6 +22,7 @@ class ResumeComment(models.Model):
     )
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
     text = models.TextField()
+    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
 
 class ResumeFile(models.Model):
     resume = models.ForeignKey(

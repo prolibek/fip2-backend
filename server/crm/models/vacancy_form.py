@@ -33,6 +33,8 @@ class VacancyRequestFormField(models.Model):
 
     form = models.ForeignKey(VacancyRequestForm, on_delete=models.CASCADE)
 
+    public = models.BooleanField(default=True)
+
     block = models.ForeignKey(
         VacancyRequestFormBlock, 
         on_delete=models.CASCADE,

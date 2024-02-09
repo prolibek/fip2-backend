@@ -7,7 +7,8 @@ class VacancyRequest(models.Model):
     owner = models.ForeignKey(Member, on_delete=models.DO_NOTHING)
     job_title = models.CharField(max_length=255)
     limit = models.IntegerField(null=True)
-    data = models.JSONField(null=True)
+    public_data = models.JSONField(null=True)
+    private_data = models.JSONField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
 
 class VacancyRequestStatus(models.Model):

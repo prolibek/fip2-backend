@@ -11,7 +11,8 @@ class Organisation(TenantMixin):
     description = models.TextField(null=True)
     slug = models.SlugField(unique=True)
 
-    creator = models.ForeignKey(get_user_model(), on_delete=models.DO_NOTHING)
+    ceo = models.ForeignKey(get_user_model(), on_delete=models.DO_NOTHING, null=True, related_name='ceo')
+    creator = models.ForeignKey(get_user_model(), on_delete=models.DO_NOTHING, related_name='creator')
 
     category = models.ForeignKey(
         OrganisationCategory,
