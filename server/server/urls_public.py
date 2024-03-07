@@ -23,7 +23,6 @@ router = DefaultRouter()
 
 router.register('organisations', OrganisationViewSet, basename='organisations')
 
-
 urlpatterns = [
     path('api/v1/public/users/register/', RegisterAPIView.as_view(), name='register'),
     path('api/v1/public/users/login/', LoginAPIView.as_view(), name='login'),

@@ -139,3 +139,20 @@ class VacancyViewSet(ModelViewSet):
             serializer.errors, 
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+    @action(detail=False, methods=['POST'])
+    def manual(self, request, *args, **kwargs):
+        serializer = VacancySerializer(request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    @action(detail=True, methods=['GET'])
+    def resume(self, request, *args, **kwargs):
+        pass

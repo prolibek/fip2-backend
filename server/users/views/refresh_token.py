@@ -7,25 +7,28 @@ from users.serializers import UserRegisterSerializer
 
 from django.conf import settings
 
-class RegisterAPIView(views.APIView):
+class RefreshTokenAPIView(views.APIView):
     def post(self, request):
-        serializer = UserRegisterSerializer(data=request.data)
+        refresh_token = request.COOKIES.get('refresh_token')
 
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        user = serializer.save()
+        if refresh_token is None:
+            return Response({
+                'detail': 'Refresh token is not valid.'
+            }, status=status.HTTP_403_FORBIDDEN)
 
-        token = RefreshToken.for_user(user)
+        token = RefreshToken(refresh_token)
+
+        # TOKEN ROTATION
+        token.blacklist()
+
+        token.set_jti()
+        token.set_exp()
+        token.set_iat()
 
         response = Response({
-            'detail': 'Registration succesfully accomplished.',
             'access_token': str(token.access_token),
-            'user': UserRegisterSerializer(user).data
-        }, status=status.HTTP_200_OK)
+            'user': UserRegisterSerializer(request.user).data
+        })
 
         response.set_cookie(
             key = settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
@@ -35,5 +38,5 @@ class RegisterAPIView(views.APIView):
             httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
             samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
         )
-        
+
         return response

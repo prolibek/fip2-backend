@@ -45,7 +45,8 @@ class OrganisationViewSet(ModelViewSet):
                 user=request.user
             )
             member.save()
-            connection.set_schema_to_public
+
+
 
             return Response(
                 serializer.data,

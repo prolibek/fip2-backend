@@ -20,6 +20,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=55)
     middle_name = models.CharField(max_length=55, null=True)
 
+    birth_date = models.DateField(null=True)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
