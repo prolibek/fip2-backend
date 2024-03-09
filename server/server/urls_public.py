@@ -27,7 +27,7 @@ urlpatterns = [
     path('api/v1/public/users/register/', RegisterAPIView.as_view(), name='register'),
     path('api/v1/public/users/login/', LoginAPIView.as_view(), name='login'),
     path('api/v1/public/users/logout/', LogoutAPIView.as_view(), name='logout'),
-    path('api/v1/public/users/refresh-token/', TokenRefreshView.as_view(), name='refresh-token'),
+    path('api/v1/public/users/refresh-token/', RefreshTokenAPIView.as_view(), name='refresh-token'),
     path('api/v1/public/', include(router.urls)),
     path('api/v1/docs/', schema_view.with_ui('swagger', cache_timeout=0),name='schema-swagger-ui'),
 ]

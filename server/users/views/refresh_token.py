@@ -4,22 +4,28 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.serializers import UserRegisterSerializer
+from users.models import Account
 
 from django.conf import settings
 
 class RefreshTokenAPIView(views.APIView):
+    authentication_classes = []
+    permission_classes = []
+
     def post(self, request):
         refresh_token = request.COOKIES.get('refresh_token')
+
+        print(refresh_token)
 
         if refresh_token is None:
             return Response({
                 'detail': 'Refresh token is not valid.'
-            }, status=status.HTTP_403_FORBIDDEN)
+            }, status=status.HTTP_401_UNAUTHORIZED)
 
         token = RefreshToken(refresh_token)
+        user = Account.objects.get(id=token['user_id'])
 
         # TOKEN ROTATION
-        token.blacklist()
 
         token.set_jti()
         token.set_exp()
@@ -27,7 +33,7 @@ class RefreshTokenAPIView(views.APIView):
 
         response = Response({
             'access_token': str(token.access_token),
-            'user': UserRegisterSerializer(request.user).data
+            'user': UserRegisterSerializer(user).data
         })
 
         response.set_cookie(
