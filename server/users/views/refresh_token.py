@@ -20,7 +20,7 @@ class RefreshTokenAPIView(views.APIView):
         if refresh_token is None:
             return Response({
                 'detail': 'Refresh token is not valid.'
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         token = RefreshToken(refresh_token)
         user = Account.objects.get(id=token['user_id'])

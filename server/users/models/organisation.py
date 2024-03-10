@@ -23,5 +23,9 @@ class Organisation(TenantMixin):
     def __str__(self):
         return self.name
 
+class UserOrganisationMembership(models.Model):
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
 class Domain(DomainMixin):
     pass
