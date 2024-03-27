@@ -15,4 +15,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('invitations/', InvitationAPIView.as_view(), name='invitation'),
     path('vacancy-requests/', VacancyRequestStatusAPIView.as_view(), name='vacancy-requests'),
+    path('vacancy-forms/', VacancyRequestFormCreate.as_view(), name='vacancy-forms')
 ]

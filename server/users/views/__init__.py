@@ -5,3 +5,4 @@ from .update_password import *
 from .user import *
 from .organisation import *
 from .refresh_token import *
+from .user_info import *

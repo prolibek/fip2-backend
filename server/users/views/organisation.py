@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
-from users.serializers import OrganisationSerializer
+from users.serializers import OrganisationSerializer, OrganisationCreateSerializer
 from users.models import Organisation, Domain
 
 from crm.models import Member
@@ -17,7 +17,7 @@ class OrganisationViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         with transaction.atomic():
-            serializer = OrganisationSerializer(data=request.data)
+            serializer = OrganisationCreateSerializer(data=request.data)
 
             if not serializer.is_valid():
                 return Response(
