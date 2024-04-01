@@ -13,12 +13,12 @@ class IsTenantMember(BasePermission):
         )
 
         if member:
-            return True 
+            return True
         return False
 
 class IsHRAndTenantMember(IsTenantMember):
     def has_permission(self, request, view):
-        return super().has_permission(request, view) and (request.role == 1)
+        return super().has_permission(request, view) and (request.user.role == 1)
 
 class IsHROrViewOnly(IsTenantMember):
     def has_permission(self, request, view):
@@ -28,4 +28,4 @@ class IsHROrViewOnly(IsTenantMember):
 
 class IsManagerAndTenantMember(IsTenantMember):
     def has_permission(self, request, view):
-        return super().has_permission(self, request, view) and (request.role == 2)
+        return super().has_permission(self, request, view) and (request.user.role == 2)

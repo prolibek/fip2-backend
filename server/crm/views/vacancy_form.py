@@ -2,8 +2,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from crm.models import VacancyRequestForm, VacancyRequestFormField, FieldChoiceOptions
+from crm.permissions import IsHRAndTenantMember
 
 class VacancyRequestFormCreate(APIView):
+    permission_classes = [IsHRAndTenantMember, ]
+
+    def get(self, request, format=None):
+        queryset = VacancyRequestForm.objects.all().values()
+        return Response(
+            queryset
+        )
+    
     def post(self, request, format=None):
         data = request.data
         form_name = data.get('name')

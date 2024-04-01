@@ -5,23 +5,34 @@ from rest_framework import status
 from django.db import transaction
 
 from crm.models import Invitation, Member
+from crm.permissions import IsTenantMember
 
 class InvitationAPIView(APIView):
+    permission_classes = [IsTenantMember, ]
+
     def post(self, request):
-        email = request.data["email"]
+        emails = request.data.get("emails")
+        if not isinstance(emails, list):
+            return Response({
+                "details": "Invalid data format: a list of emails is required."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         organisation = request.tenant
+        invitation_tokens = []
 
         with transaction.atomic():
-            invitation = Invitation.create_invitation(
-                email=email,
-                organisation=organisation
-            )
+            for email in emails:
+                invitation = Invitation.create_invitation(
+                    email=email,
+                    organisation=organisation
+                )
+                invitation_tokens.append(invitation.token)
 
         return Response({
-            "token": invitation.token,
-            "details": "Invitation sent to an email."
+            "tokens": invitation_tokens,
+            "details": f"Invitations sent to {len(invitation_tokens)} emails."
         }, status=status.HTTP_201_CREATED)
-    
+
     def get(self, request):
         token = request.data.get("token")
         

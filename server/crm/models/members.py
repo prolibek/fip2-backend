@@ -28,7 +28,7 @@ class Invitation(models.Model):
         super().save(*args, **kwargs)
 
     def send_invitation(self):
-        link = f"/join/{self.token}/"
+        link = f"{settings.FRONTEND_URL}/join/{self.token}/"
         message = f"Please use this link to join: {link}"
         send_mail(
             'Invitation to Join',
