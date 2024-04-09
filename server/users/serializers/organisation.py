@@ -8,7 +8,7 @@ class OrganisationCreateSerializer(ModelSerializer):
         model = Organisation
         fields = ['name', 'slug']
 
-class OrganisationSerializer(ModelSerializer):
+class OrganisationSerializer(ModelSerializer):    
     class Meta:
         model = Organisation
         fields = '__all__'
@@ -19,3 +19,10 @@ class OrganisationSerializer(ModelSerializer):
         self.fields['ceo'].required = False
         self.fields['creator'].required = False
         self.fields['schema_name'].required = False
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance) 
+
+        rep["ceo"] = AccountSerializer(instance.ceo).data 
+
+        return rep

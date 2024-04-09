@@ -10,6 +10,7 @@ class VacancyRequest(models.Model):
     public_data = models.JSONField(null=True)
     private_data = models.JSONField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
+    ceo_approve = models.BooleanField(default=False)
 
 class VacancyRequestStatus(models.Model):
     status_choices = (
@@ -17,7 +18,7 @@ class VacancyRequestStatus(models.Model):
         (2, 'Approved'),
         (3, 'Declined')
     )
-    
+
     status = models.SmallIntegerField(choices=status_choices, default=1)
     request = models.ForeignKey(VacancyRequest, on_delete=models.CASCADE)
     approver = models.ForeignKey(Manager, on_delete=models.CASCADE)

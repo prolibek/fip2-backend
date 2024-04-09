@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import get_object_or_404
 
@@ -38,13 +39,6 @@ class VacancyRequestViewSet(ModelViewSet):
 
         manager = Manager.objects.filter(member=member).first()
 
-        # adding approval for ceo anyways
-        if request.tenant.ceo:
-            approval = VacancyRequestStatus.objects.create(
-                request=serializer.instance,
-                approver=request.tenant.ceo
-            )
-            approval.save()
         if manager:
             create_status_entities(
                 manager=manager, 
@@ -54,16 +48,46 @@ class VacancyRequestViewSet(ModelViewSet):
             
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
-    @action(detail=True, methods=['GET'])
-    def request_status(self, request, pk=None):
-        vacancyrequest = get_object_or_404(VacancyRequest, id=pk)
-        request_status_list = vacancyrequest.vacancyrequeststatus_set.all().values()
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        request_status_list = instance.vacancyrequeststatus_set.all().values()
         return Response(
             {
-                "request": VacancyRequestSerializer(vacancyrequest).data,
+                **serializer.data,
                 "status": request_status_list
             }
         )
+    
+    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    def my(self, request, *args, **kwargs):
+        member = get_object_or_404(Member, user=request.user)
+        user_requests = VacancyRequest.objects.filter(owner=member)
+        
+        serializer = VacancyRequestSerializer(user_requests, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    def for_approval(self, request):
+        member = get_object_or_404(Member, user=request.user)
+
+        if request.user == request.tenant.ceo:
+            return Response(
+                VacancyRequestSerializer(
+                    VacancyRequest.objects.exclude(owner=member).filter(ceo_approve=False), 
+                    many=True
+                ).data
+            )
+
+        try:
+            manager = Manager.objects.get(member=member)
+        except Manager.DoesNotExist:
+            return Response([])
+
+        vacancy_requests = VacancyRequest.objects.filter(vacancyrequeststatus__approver=manager).distinct()
+        
+        serializer = VacancyRequestSerializer(vacancy_requests, many=True)
+        return Response(serializer.data)
 
 class VacancyRequestStatusAPIView(APIView):
     def get_object(self, pk):
@@ -75,7 +99,16 @@ class VacancyRequestStatusAPIView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
     def patch(self, request, pk=None):
+        member = get_object_or_404(Member, user=request.user)
+        manager = get_object_or_404(Manager, member=member)
+
         request_status = self.get_object(pk)
+
+        if request_status.approver != manager:
+            return Response({
+                "detail": "You are not eligible to change this status."
+            }, status=status.HTTP_403_FORBIDDEN)
+
         serializer = VacancyRequestStatusSerializer(
             request_status,
             data={
@@ -121,9 +154,9 @@ class VacancyViewSet(ModelViewSet):
             
         serializer = VacancySerializer(
             data={
-                "job_title": vrequest.job_title,
+                "job_title": request.data.get('job_title'),
                 "owner": vrequest.owner.id,
-                "limit": vrequest.limit,
+                "limit": request.data.get('limit'),
                 "public_data": vrequest.public_data,
                 "private_data": vrequest.private_data,
                 "request": vrequest,

@@ -27,8 +27,8 @@ class Invitation(models.Model):
             self.token = get_random_string(50)
         super().save(*args, **kwargs)
 
-    def send_invitation(self):
-        link = f"{settings.FRONTEND_URL}/join/{self.token}/"
+    def send_invitation(self, request):
+        link = f"{settings.FRONTEND_URL}/organisations/{request.tenant.slug}/join?token={self.token}/"
         message = f"Please use this link to join: {link}"
         send_mail(
             'Invitation to Join',
@@ -39,9 +39,9 @@ class Invitation(models.Model):
         )
 
     @classmethod
-    def create_invitation(cls, email, organisation):
+    def create_invitation(cls, email, organisation, request):
         invitation = cls(email=email, organisation=organisation)
         invitation.save()
-        invitation.send_invitation()
+        invitation.send_invitation(request=request)
 
         return invitation

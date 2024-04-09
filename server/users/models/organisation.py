@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django_tenants.models import TenantMixin, DomainMixin
 
 class Organisation(TenantMixin):
+    avatar = models.ImageField(null=True)
     name = models.CharField(max_length=60)
     description = models.TextField(null=True, unique=True)
     slug = models.SlugField(unique=True)

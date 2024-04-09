@@ -4,7 +4,7 @@ from django_tenants.utils import schema_context
 from crm.models import Member 
 from users.models import UserOrganisationMembership
 
-@receiver(post_save, sender=Member)
+@receiver(post_save, sender=Member, dispatch_uid="xsh187ax")
 def create_user_organisation_membership(sender, instance, created, **kwargs):
     if created:
         with schema_context('public'):

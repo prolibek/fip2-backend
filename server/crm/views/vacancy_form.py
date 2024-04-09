@@ -1,11 +1,21 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from crm.models import VacancyRequestForm, VacancyRequestFormField, FieldChoiceOptions
-from crm.permissions import IsHRAndTenantMember
+from crm.permissions import IsHRAndTenantMember, IsTenantMember
+from crm.serializers import VacancyRequestFormSerializer
 
 class VacancyRequestFormCreate(APIView):
     permission_classes = [IsHRAndTenantMember, ]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = [IsTenantMember, ]
+        else: 
+            permission_classes = [IsHRAndTenantMember, ]
+        
+        return [permission() for permission in permission_classes]
 
     def get(self, request, format=None):
         queryset = VacancyRequestForm.objects.all().values()
@@ -54,3 +64,16 @@ class VacancyRequestFormCreate(APIView):
                     FieldChoiceOptions.objects.create(option=option, field=form_field)
 
         return Response({"success": "Form created successfully."}, status=status.HTTP_201_CREATED)
+
+
+class VacancyRequestFormDetail(APIView):
+    permission_classes = [ IsTenantMember ]
+
+    def get_object(self, pk):
+        return get_object_or_404(VacancyRequestForm, id=pk)
+
+    def get(self, request, pk, format=None):
+        form = self.get_object(pk)
+        serializer = VacancyRequestFormSerializer(form)
+
+        return Response(serializer.data)

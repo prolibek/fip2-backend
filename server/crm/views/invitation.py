@@ -24,7 +24,8 @@ class InvitationAPIView(APIView):
             for email in emails:
                 invitation = Invitation.create_invitation(
                     email=email,
-                    organisation=organisation
+                    organisation=organisation,
+                    request=request
                 )
                 invitation_tokens.append(invitation.token)
 
@@ -33,7 +34,9 @@ class InvitationAPIView(APIView):
             "details": f"Invitations sent to {len(invitation_tokens)} emails."
         }, status=status.HTTP_201_CREATED)
 
-    def get(self, request):
+
+class InvitationAcceptAPIView(APIView):
+    def post(self, request):
         token = request.data.get("token")
         
         if not token:
@@ -58,14 +61,15 @@ class InvitationAPIView(APIView):
                 "details": "Invitation is not for this user."
             }, status=status.HTTP_403_FORBIDDEN)
 
-        invitation.is_used = True 
-        invitation.save()
+        user_invitations = Invitation.objects.filter(email=request.user.email, is_used=False)
+        for user_invitation in user_invitations:
+            user_invitation.is_used = True
+            user_invitation.save()
 
-        member = Member.objects.create(
+        Member.objects.create(
             user=request.user,
             organisation=invitation.organisation
         )
-        member.save()
 
         return Response({
             "details": f"{request.user.email} succesfully added to {invitation.organisation.name}"
