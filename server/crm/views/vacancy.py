@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from crm.permissions import IsTenantMember, IsHRAndTenantMember, IsHROrViewOnly
 from crm.serializers import VacancySerializer, VacancyRequestSerializer, VacancyRequestStatusSerializer
@@ -59,6 +60,18 @@ class VacancyRequestViewSet(ModelViewSet):
             }
         )
     
+    def destroy(self, request, *args, **kwargs):
+        member = get_object_or_404(Member, user=request.user)
+
+        instance = self.get_object()
+        if instance.owner != member:
+            return Response({
+                "detail": "Only vacancy request owner can retract vacancy."
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
     @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
     def my(self, request, *args, **kwargs):
         member = get_object_or_404(Member, user=request.user)
@@ -70,14 +83,16 @@ class VacancyRequestViewSet(ModelViewSet):
     @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
     def for_approval(self, request):
         member = get_object_or_404(Member, user=request.user)
-
+    
         if request.user == request.tenant.ceo:
             return Response(
                 VacancyRequestSerializer(
-                    VacancyRequest.objects.exclude(owner=member).filter(ceo_approve=False), 
+                    VacancyRequest.objects.exclude(owner=member).filter(ceo_approved=1), 
                     many=True
                 ).data
             )
+    
+        manager = get_object_or_404(Manager, member=member)
 
         try:
             manager = Manager.objects.get(member=member)
@@ -87,6 +102,72 @@ class VacancyRequestViewSet(ModelViewSet):
         vacancy_requests = VacancyRequest.objects.filter(vacancyrequeststatus__approver=manager).distinct()
         
         serializer = VacancyRequestSerializer(vacancy_requests, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
+    def approve(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.owner == request.tenant.ceo:
+            return Response({
+                "detail": "CEO cannot approve their own request."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.tenant.ceo == request.user and instance.owner != request.tenant.ceo:
+            serializer = VacancyRequestSerializer(
+                instance,
+                data={ "ceo_approved": request.data['status'] },
+                partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(
+                    serializer.errors, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        member = get_object_or_404(Member, user=request.user)
+        manager = get_object_or_404(Manager, member=member)
+
+        try:
+            vstatus = VacancyRequestStatus.objects.get(
+                request=instance, 
+                approver=manager
+            )
+        except VacancyRequestStatus.DoesNotExist:
+            return Response({
+                "detail": "You are not eligible to set status for this vacancy."
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = VacancyRequestStatusSerializer(
+            vstatus,
+            data={
+                "status": request.data["status"]
+            },
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    def fully_approved(self, request, *args, **kwargs):
+        approved_requests = VacancyRequest.objects.filter(
+            Q(ceo_approved=2) & (
+                Q(vacancyrequeststatus__isnull=True) |
+                Q(vacancyrequeststatus__status=2)
+            ) & (
+                Q(vacancy__isnull=False)
+            )
+        ).distinct()
+
+        serializer = self.get_serializer(approved_requests, many=True)
         return Response(serializer.data)
 
 class VacancyRequestStatusAPIView(APIView):
@@ -144,19 +225,24 @@ class VacancyViewSet(ModelViewSet):
                 "detail": "Vacancy request not found."
             }, status=status.HTTP_404_NOT_FOUND)
         
+        if Vacancy.objects.filter(vacancy_request=vrequest).exists():
+            return Response({
+                "detail": "A vacancy has already been created for this request."
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         vstatuses = VacancyRequestStatus.objects.filter(id=request_id)
         
-        for vstatus in vstatuses:
-            if vstatus.status != 2:
-                return Response({
-                    "detail": "All managers and CEO must approve this request before creating vacancy."
-                }, status=status.HTTP_403_FORBIDDEN)
+        if vstatuses:
+            for vstatus in vstatuses:
+                if vstatus.status != 2:
+                    return Response({
+                        "detail": "All superior managers and CEO must approve this request before creating vacancy."
+                    }, status=status.HTTP_403_FORBIDDEN)
             
         serializer = VacancySerializer(
             data={
-                "job_title": request.data.get('job_title'),
+                "job_title": vrequest.job_title,
                 "owner": vrequest.owner.id,
-                "limit": request.data.get('limit'),
                 "public_data": vrequest.public_data,
                 "private_data": vrequest.private_data,
                 "request": vrequest,

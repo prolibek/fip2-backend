@@ -13,7 +13,6 @@ class VacancyCategory(models.Model):
 class Vacancy(models.Model):
     job_title = models.CharField(max_length=255)
     owner = models.ForeignKey(Member, on_delete=models.DO_NOTHING)
-    limit = models.IntegerField(null=True)
     public_data = models.JSONField(null=True)
     private_data = models.JSONField(null=True)
     public_info = models.TextField(null=True)
