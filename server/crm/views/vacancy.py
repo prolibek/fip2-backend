@@ -162,9 +162,9 @@ class VacancyRequestViewSet(ModelViewSet):
             Q(ceo_approved=2) & (
                 Q(vacancyrequeststatus__isnull=True) |
                 Q(vacancyrequeststatus__status=2)
-            ) & (
-                Q(vacancy__isnull=False)
             )
+        ).exclude(
+            vacancy__isnull=False
         ).distinct()
 
         serializer = self.get_serializer(approved_requests, many=True)
@@ -246,7 +246,8 @@ class VacancyViewSet(ModelViewSet):
                 "public_data": vrequest.public_data,
                 "private_data": vrequest.private_data,
                 "request": vrequest,
-                "comments": request.data.get('comments')
+                "comments": request.data.get('comments'),
+                "vacancy_request": request_id
             }
         )
 

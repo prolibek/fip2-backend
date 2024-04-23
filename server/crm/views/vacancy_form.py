@@ -1,12 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
+
 from crm.models import VacancyRequestForm, VacancyRequestFormField, FieldChoiceOptions
 from crm.permissions import IsHRAndTenantMember, IsTenantMember
 from crm.serializers import VacancyRequestFormSerializer
 
-class VacancyRequestFormCreate(APIView):
+class VacancyRequestFormAPIView(APIView):
     permission_classes = [IsHRAndTenantMember, ]
 
     def get_permissions(self):
@@ -18,10 +21,9 @@ class VacancyRequestFormCreate(APIView):
         return [permission() for permission in permission_classes]
 
     def get(self, request, format=None):
-        queryset = VacancyRequestForm.objects.all().values()
-        return Response(
-            queryset
-        )
+        queryset = VacancyRequestForm.objects.annotate(fields_count=Count('vacancyrequestformfield'))
+        results = [{'id': form.id, 'form_title': form.form_title, 'date_created': form.date_created, 'fields_count': form.fields_count} for form in queryset]
+        return Response(results)
     
     def post(self, request, format=None):
         data = request.data
