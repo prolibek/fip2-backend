@@ -2,6 +2,7 @@ from rest_framework.serializers import ModelSerializer
 
 from crm.models import Vacancy, VacancyRequest, VacancyRequestStatus
 from crm.serializers import ManagerSerializer
+from users.serializers import AccountSerializer
 
 class VacancyRequestSerializer(ModelSerializer):
     class Meta:
@@ -29,3 +30,10 @@ class VacancySerializer(ModelSerializer):
     class Meta:
         model = Vacancy
         fields = '__all__'
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+
+        rep["owner"] = AccountSerializer(instance.owner.user).data
+
+        return rep

@@ -7,10 +7,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.conf import settings
 
 from crm.permissions import IsTenantMember, IsHRAndTenantMember, IsHROrViewOnly
 from crm.serializers import VacancySerializer, VacancyRequestSerializer, VacancyRequestStatusSerializer
 from crm.models import VacancyRequest, Member, Manager, VacancyRequestStatus, Vacancy
+from crm.pagination import StandardResultsSetPagination
 
 def create_status_entities(manager, vacancyrequest, request):
     while manager.parent_manager is not None and manager.user != request.tenant.ceo:
@@ -25,6 +27,7 @@ class VacancyRequestViewSet(ModelViewSet):
     serializer_class = VacancyRequestSerializer
     queryset = VacancyRequest.objects.all()
     permission_classes = (IsTenantMember, )
+    pagination_class = StandardResultsSetPagination
 
     def create(self, request):
         serializer = VacancyRequestSerializer(data=request.data)
