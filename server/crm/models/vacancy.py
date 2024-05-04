@@ -34,3 +34,10 @@ class Vacancy(models.Model):
 
     def __str__(self):
         return self.job_title
+
+class VacancyComment(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(Member, on_delete=models.DO_NOTHING)
+    text = models.TextField()
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True)

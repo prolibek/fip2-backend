@@ -10,8 +10,8 @@ from django.db.models import Q
 from django.conf import settings
 
 from crm.permissions import IsTenantMember, IsHRAndTenantMember, IsHROrViewOnly
-from crm.serializers import VacancySerializer, VacancyRequestSerializer, VacancyRequestStatusSerializer
-from crm.models import VacancyRequest, Member, Manager, VacancyRequestStatus, Vacancy
+from crm.serializers import VacancySerializer, VacancyRequestSerializer, VacancyRequestStatusSerializer, VacancyCommentSerializer
+from crm.models import VacancyRequest, Member, Manager, VacancyRequestStatus, Vacancy, VacancyComment
 from crm.pagination import StandardResultsSetPagination
 
 def create_status_entities(manager, vacancyrequest, request):
@@ -162,12 +162,13 @@ class VacancyRequestViewSet(ModelViewSet):
     @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
     def fully_approved(self, request, *args, **kwargs):
         approved_requests = VacancyRequest.objects.filter(
-            Q(ceo_approved=2) & (
+            Q(owner = Member.objects.get(user = request.tenant.ceo)) |
+            ( Q(ceo_approved=2) & (
                 Q(vacancyrequeststatus__isnull=True) |
                 Q(vacancyrequeststatus__status=2)
-            )
+            ) )
         ).exclude(
-            vacancy__isnull=False
+            vacancy__isnull=False   
         ).distinct()
 
         serializer = self.get_serializer(approved_requests, many=True)
@@ -263,6 +264,14 @@ class VacancyViewSet(ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    @action(detail=False, methods=['GET'])
+    def my(self, request, *args, **kwargs):
+        member = get_object_or_404(Member, user=request.user)
+        user_vacancies = Vacancy.objects.filter(owner=member)
+
+        serializer = VacancySerializer(user_vacancies, many=True)
+        return Response(serializer.data)
+
     @action(detail=False, methods=['POST'])
     def manual(self, request, *args, **kwargs):
         serializer = VacancySerializer(request.data)
@@ -279,3 +288,8 @@ class VacancyViewSet(ModelViewSet):
     @action(detail=True, methods=['GET'])
     def resume(self, request, *args, **kwargs):
         pass
+
+class VacancyCommentAPIView(ModelViewSet):
+    serializer_class = VacancyCommentSerializer
+    queryset = VacancyComment.objects.all()
+    permission_classes = (IsTenantMember, )
