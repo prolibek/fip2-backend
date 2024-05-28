@@ -5,3 +5,4 @@ from .manager import *
 from .vacancy_form import *
 from .members import *
 from .organisation import *
+from .resume import *
