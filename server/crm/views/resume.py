@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 class ResumeViewSet(ModelViewSet):
+    queryset = Resume.objects.all()
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return ResumeDetailSerializer
