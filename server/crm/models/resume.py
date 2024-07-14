@@ -19,6 +19,21 @@ class Resume(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_received = models.DateTimeField(null=True)
 
+    status_choices = (
+        (1, 'Filtration'),
+        (2, 'Pending'),
+        (3, 'Approved'),
+        (4, 'Declined')
+    )
+    status = models.SmallIntegerField(choices=status_choices, default=1)
+
+    vacancy = models.ForeignKey(Vacancy, null=True, on_delete=models.DO_NOTHING)
+
+class ResumeInfo(models.Model):
+    source = models.CharField(max_length=55)
+    text = models.TextField()
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
+
 class ResumeComment(models.Model):
     owner = models.ForeignKey(
         get_user_model(), 
@@ -35,23 +50,13 @@ class ResumeFile(models.Model):
     )
     file = models.FileField()
 
-class Request(models.Model):
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
-    date_sent = models.DateTimeField(auto_now_add=True)
-
-    status_choices = (
-        (1, 'Filtration'),
-        (2, 'Pending'),
-        (3, 'Approved'),
-        (4, 'Declined')
-    )
-    status = models.SmallIntegerField(choices=status_choices)
-
 class Interview(models.Model):
-    date = models.DateTimeField(null=True)
+    name = models.CharField(max_length=72)
+    date = models.DateField(null=True)
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)
     notes = models.TextField(null=True)
-    request = models.ForeignKey(Request, on_delete=models.CASCADE)
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
 
 class InterviewComment(models.Model):
     interview = models.ForeignKey(Interview, on_delete=models.CASCADE)

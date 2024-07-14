@@ -2,6 +2,7 @@ from rest_framework import views, status
 from rest_framework.response import Response
 
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 from users.serializers import UserRegisterSerializer
 from users.models import Account
@@ -22,7 +23,13 @@ class RefreshTokenAPIView(views.APIView):
                 'detail': 'Refresh token is not valid.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        token = RefreshToken(refresh_token)
+        try:
+            token = RefreshToken(refresh_token)
+        except TokenError:
+            return Response({
+                'detail': 'Refresh token expired.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         user = Account.objects.get(id=token['user_id'])
 
         # TOKEN ROTATION
