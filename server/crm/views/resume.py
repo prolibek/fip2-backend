@@ -28,17 +28,49 @@ class ResumeViewSet(ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    @action(detail=True, methods=['GET', 'POST'], permission_classes=[IsAuthenticated,])
-    def interviews(self, request, *args, **kwargs):
-        pk = kwargs.get('pk')
-        
-        if request.method == 'GET':
-            interviews = Interview.objects.filter(resume=pk).values()
-            return Response({"interviews": interviews})
-        
-        elif request.method == 'POST':
-            serializer = InterviewSerializer(data={**request.data, "resume": pk})
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # @action(detail=True, methods=['GET', 'POST', 'PATCH', 'DELETE'], permission_classes=[IsAuthenticated])
+    # def interviews(self, request, *args, **kwargs):
+    #     pk = kwargs.get('pk')
+    #     
+    #     if request.method == 'GET':
+    #         interviews = Interview.objects.filter(resume=pk).values()
+    #         return Response({"interviews": interviews})
+    #     
+    #     elif request.method == 'POST':
+    #         serializer = InterviewSerializer(data={**request.data, "resume": pk})
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #     
+    #     elif request.method == 'PATCH':
+    #         interview = request.data.get('id')
+    #         try:
+    #             interview = Interview.objects.get(pk=interview, resume=pk)
+    #         except Interview.DoesNotExist:
+    #             return Response({"detail": "Interview not found."}, status=status.HTTP_404_NOT_FOUND)
+    #         
+    #         serializer = InterviewSerializer(interview, data=request.data, partial=True)
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             return Response(serializer.data, status=status.HTTP_200_OK)
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #     
+    #     elif request.method == 'DELETE':
+    #         interview_id = request.data.get('id')
+    #         try:
+    #             interview = Interview.objects.get(pk=interview_id, resume=pk)
+    #         except Interview.DoesNotExist:
+    #             return Response({"detail": "Interview not found."}, status=status.HTTP_404_NOT_FOUND)
+    #         
+    #         interview.delete()
+    #         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class InterviewViewSet(ModelViewSet):
+    queryset = Interview.objects.all()
+    serializer_class = InterviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        resume_id = self.kwargs['resume_pk']
+        return Interview.objects.filter(resume_id=resume_id)

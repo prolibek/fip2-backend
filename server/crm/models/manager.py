@@ -3,6 +3,7 @@ from django.db import models
 from .members import Member
 
 class Manager(models.Model):
+    id = models.CharField(max_length=255, primary_key=True) 
     position = models.CharField(max_length=64)
     parent_manager = models.ForeignKey(
         'self', 

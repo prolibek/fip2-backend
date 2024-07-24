@@ -15,8 +15,12 @@ router.register("managers", ManagerViewSet, basename="managers")
 router.register("members", MemberViewSet, basename="managers")
 router.register("resumes", ResumeViewSet, basename="resumes")
 
+resumes_router = NestedSimpleRouter(router, 'resumes', lookup='resume')
+resumes_router.register('interviews', InterviewViewSet, basename='resume-interviews')
+
 urlpatterns = [
     path('', include(router.urls)),
+    path('', include(resumes_router.urls)),
     path('invitation-create/', InvitationAPIView.as_view(), name='invitation'),
     path('invitation-accept/', InvitationAcceptAPIView.as_view(), name='invitation-accept'),
     path('vacancy-requests/', VacancyRequestStatusAPIView.as_view(), name='vacancy-requests'),
